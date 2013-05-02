@@ -1,4 +1,4 @@
 loadOnDemand
 ============
 
-angularjs load on demand module
+angularjs module is designed to download other modules angularjs when they need them
