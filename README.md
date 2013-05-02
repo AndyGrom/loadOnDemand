@@ -1,7 +1,7 @@
 loadOnDemand
 ============
 
-angularjs module is designed to download other modules angularjs when they need them
+Load on demand angularjs modules. Angularjs module is designed to download other modules angularjs when they need them
 
 Using
 -----
