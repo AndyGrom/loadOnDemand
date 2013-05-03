@@ -1,0 +1,21 @@
+{
+  "name": "loadOnDemandExample",
+  "description": "Example for demonstration loadOnDemand angularjs module",
+  "version": "0.0.1",
+  "author": {
+    "name": "AndyGrom",
+    "email": "andy.grom@yandex.ru"
+  },
+  "keywords": [
+    "angularjs"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/andygrom/loadondemand.git"
+  },
+  "dependencies": {
+	"express" : "3.2.1", 
+	"ejs" : "*"
+  },
+  "_id": "loadOnDemandExample@0.0.1"
+}
