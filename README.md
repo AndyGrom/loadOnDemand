@@ -10,18 +10,18 @@ Key features
 
 Using
 -----
-Put loadOnDemand.js into you project:
+1. Put loadOnDemand.js into you project:
 
 ```html
 <script src="loadOnDemand.js"></script>
 ```
-Specify dependence loadOnDemand module for your application:
+2. Specify dependence loadOnDemand module for your application:
 
 ```javascript
 var app = angular.module('app', ['loadOnDemand']);
 ```
 
-Configure the service provider $loadOnDemandProvider
+3. Configure the service provider $loadOnDemandProvider
 
 ```javascript
 app.config(['$loadOnDemandProvider', function ($loadOnDemandProvider) {
@@ -35,7 +35,7 @@ app.config(['$loadOnDemandProvider', function ($loadOnDemandProvider) {
 }]);
 ```
 
-When will need to download the module, enter it in the markup by the directive load-on-demand:
+4. When will need to download the module, enter it in the markup by the directive load-on-demand:
 
 ```html
 <div load-on-demand="'module_name'"></div>
