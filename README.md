@@ -3,6 +3,11 @@ loadOnDemand
 
 Load on demand angularjs modules. Angularjs module is designed to download other modules angularjs when they need them
 
+Key features
+------------
+1. Dependencies are automatically loaded
+2. Debugger like ( no eval code )
+
 Using
 -----
 Put loadOnDemand.js into you project:
