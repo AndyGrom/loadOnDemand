@@ -150,12 +150,8 @@
     module.directive('loadOnDemand', ['$http', 'scriptCache', '$log', '$loadOnDemand', '$compile', '$timeout',
         function ($http, scriptCache, $log, $loadOnDemand, $compile, $timeout) {
             return {
-                restrict: 'ECA',
-                terminal: true,
-                scope: false,
-                compile: function(elm, attr) {
-                    var srcExp = attr.loadOnDemand,
-                        postlinkFn = function (scope, element) {
+                        return function (scope, element, attr) {
+							var srcExp = attr.loadOnDemand,
                             var childScope;
 
                             function clearContent() {
@@ -210,9 +206,6 @@
                                     clearContent();
                                 }
                             });
-
-                        };
-                    return postlinkFn;
                 }
             };
         }]);
