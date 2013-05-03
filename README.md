@@ -23,22 +23,22 @@ Using
 
 3. Configure the service provider $loadOnDemandProvider
 
-```javascript
-app.config(['$loadOnDemandProvider', function ($loadOnDemandProvider) {
-	var modules = [
-        {
-            name: 'module_name',		// name of module
-            script: 'js/module_name.js' // path to javascript file
-        }
-	];
-	$loadOnDemandProvider.config(modules);
-}]);
-```
+   ```javascript
+   app.config(['$loadOnDemandProvider', function ($loadOnDemandProvider) {
+	   var modules = [
+           {
+               name: 'module_name',		// name of module
+               script: 'js/module_name.js' // path to javascript file
+           }
+	   ];
+	   $loadOnDemandProvider.config(modules);
+   }]);
+   ```
 
 4. When will need to download the module, enter it in the markup by the directive load-on-demand:
 
-```html
-<div load-on-demand="'module_name'"></div>
-```
+   ```html
+   <div load-on-demand="'module_name'"></div>
+   ```
 
 See the example in the folder 'example'
