@@ -35,3 +35,5 @@ When will need to download the module, enter it in the markup by the directive l
 ```html
 <div load-on-demand="'module_name'"></div>
 ```
+
+See the example in the folder 'example'
