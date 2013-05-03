@@ -12,14 +12,14 @@ Using
 -----
 1. Put loadOnDemand.js into you project:
 
-```html
-<script src="loadOnDemand.js"></script>
-```
+   ```html
+   <script src="loadOnDemand.js"></script>
+   ```
 2. Specify dependence loadOnDemand module for your application:
 
-```javascript
-var app = angular.module('app', ['loadOnDemand']);
-```
+   ```javascript
+   var app = angular.module('app', ['loadOnDemand']);
+   ```
 
 3. Configure the service provider $loadOnDemandProvider
 
