@@ -15,9 +15,9 @@
                 var modules = { },
                     providers = {
                         $controllerProvider: $controllerProvider,
-                        $provide: $provide,
                         $compileProvider: $compileProvider,
-                        $filterProvider: $filterProvider
+                        $filterProvider: $filterProvider,
+                        $provide: $provide // other things
                     };
                 this.$get = ['scriptCache', '$timeout', '$log',
                     function (scriptCache, $timeout, $log) {
@@ -150,62 +150,63 @@
     module.directive('loadOnDemand', ['$http', 'scriptCache', '$log', '$loadOnDemand', '$compile', '$timeout',
         function ($http, scriptCache, $log, $loadOnDemand, $compile, $timeout) {
             return {
-                        return function (scope, element, attr) {
-							var srcExp = attr.loadOnDemand,
-                            var childScope;
+                link: function (scope, element, attr) {
+                    var srcExp = attr.loadOnDemand,
+                        childScope;
 
-                            function clearContent() {
-                                if (childScope) {
-                                    childScope.$destroy();
-                                    childScope = null;
+                    function clearContent() {
+                        if (childScope) {
+                            childScope.$destroy();
+                            childScope = null;
+                        }
+                        element.html('');
+                    }
+
+                    function loadTemplate(url, callback) {
+                        var resourceId = 'view:' + url,
+                            view;
+                        if (!scriptCache.get(resourceId)) {
+                            $http.get(url).
+                                success(function(data) {
+                                    scriptCache.put(resourceId, data);
+                                    callback(data);
+                                })
+                                .error(function(data) {
+                                    $log.error('Error load template "' + url + "': " + data);
+                                });
+                        } else {
+                            view = scriptCache.get(resourceId);
+                            $timeout(function() {
+                                callback(view);
+                            }, 0);
+                        }
+                    }
+
+                    scope.$watch(srcExp, function(moduleName) {
+                        var moduleConfig = $loadOnDemand.getConfig(moduleName);
+
+                        if (moduleName) {
+                            $loadOnDemand.load(moduleName, function() {
+                                if (!moduleConfig.template) {
+                                    return;
                                 }
-                                element.html('');
-                            }
+                                loadTemplate(moduleConfig.template, function(response) {
 
-                            function loadTemplate(url, callback) {
-                                var resourceId = 'view:' + url,
-                                    view;
-                                if (!scriptCache.get(resourceId)) {
-                                    $http.get(url).
-                                        success(function (data) {
-                                            scriptCache.put(resourceId, data);
-                                            callback(data);
-                                        })
-                                        .error(function (data) {
-                                            $log.error('Error load template "' + url + "': " + data);
-                                        });
-                                } else {
-                                    view = scriptCache.get(resourceId);
-                                    $timeout(function () {
-                                        callback(view);
-                                    }, 0);
-                                }
-                            }
+                                    childScope = scope.$new();
+                                    element.html(response);
 
-                            scope.$watch(srcExp, function (moduleName) {
-                                var moduleConfig = $loadOnDemand.getConfig(moduleName);
+                                    var content = element.contents(),
+                                        linkFn = $compile(content);
 
-                                if (moduleName) {
-                                    $loadOnDemand.load(moduleName, function () {
-                                        if (!moduleConfig.template) {
-                                            return;
-                                        }
-                                        loadTemplate(moduleConfig.template, function (response) {
+                                    linkFn(childScope);
+                                });
 
-                                            childScope = scope.$new();
-                                            element.html(response);
-
-                                            var content = element.contents(),
-                                                linkFn = $compile(content);
-
-                                            linkFn(childScope);
-                                        });
-
-                                    });
-                                } else {
-                                    clearContent();
-                                }
                             });
+                        } else {
+                            clearContent();
+                        }
+                    });
+
                 }
             };
         }]);

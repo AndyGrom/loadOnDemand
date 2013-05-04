@@ -15,9 +15,9 @@
                 var modules = { },
                     providers = {
                         $controllerProvider: $controllerProvider,
-                        $provide: $provide,
                         $compileProvider: $compileProvider,
-                        $filterProvider: $filterProvider
+                        $filterProvider: $filterProvider,
+                        $provide: $provide // other things
                     };
                 this.$get = ['scriptCache', '$timeout', '$log',
                     function (scriptCache, $timeout, $log) {
