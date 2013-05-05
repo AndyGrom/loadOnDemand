@@ -22,8 +22,8 @@
                         $filterProvider: $filterProvider,
                         $provide: $provide // other things
                     };
-                this.$get = ['scriptCache', '$timeout', '$log', '$document',
-                    function (scriptCache, $timeout, $log, $document) {
+                this.$get = ['scriptCache', '$timeout', '$log', '$document', '$injector',
+                    function (scriptCache, $timeout, $log, $document, $injector) {
                         return {
                             getConfig: function (name) {
                                 if (!modules[name]) {
@@ -112,7 +112,7 @@
                                     loadScript(config.script, function () {
                                         moduleCache.push(name);
                                         loadDependencies(name, function () {
-                                            register(providers, moduleCache);
+                                            register($injector, providers, moduleCache);
                                             $timeout(function () {
                                                 callback(false);
                                             });
@@ -226,13 +226,15 @@
         }
         return true;
     }
-    function register(providers, registerModules) {
+    function register($injector, providers, registerModules) {
         var i, ii, k, invokeQueue, moduleName, moduleFn, invokeArgs, provider;
         if (registerModules) {
-            for (k = 0; k < registerModules.length; k++) {
+            var runBlocks = [];
+            for (k = registerModules.length-1; k >= 0; k--) {
                 moduleName = registerModules[k];
-                moduleFn = angular.module(moduleName);
                 regModules.push(moduleName);
+                moduleFn = angular.module(moduleName);
+                runBlocks = runBlocks.concat(moduleFn._runBlocks);
                 try {
                     for (invokeQueue = moduleFn._invokeQueue, i = 0, ii = invokeQueue.length; i < ii; i++) {
                         invokeArgs = invokeQueue[i];
@@ -251,7 +253,11 @@
                     $log.error(e.message);
                     throw e;
                 }
+                registerModules.pop();
             }
+            angular.forEach(runBlocks, function(fn) {
+                $injector.invoke(fn);
+            });
         }
         return null;
     }
