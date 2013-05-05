@@ -3,15 +3,15 @@
     'use strict';
     var regModules = ["ng"];
     
-    var module = angular.module('loadOnDemand', []);
+    var aModule = angular.module('loadOnDemand', []);
 
-    module.factory('scriptCache', ['$cacheFactory', function ($cacheFactory) {
+    aModule.factory('scriptCache', ['$cacheFactory', function ($cacheFactory) {
         return $cacheFactory('scriptCache', {
             capacity: 10
         });
     } ]);
 
-    module.provider('$loadOnDemand',
+    aModule.provider('$loadOnDemand',
         ['$controllerProvider', '$provide', '$compileProvider', '$filterProvider',
             function ($controllerProvider, $provide, $compileProvider, $filterProvider) {
                 
@@ -35,8 +35,8 @@
                                 var self = this,
                                     config = self.getConfig(name),
                                     resourceId = 'script:' + config.script,
-                                    modules = [];
-                                modules.push = function(value) {
+                                    moduleCache = [];
+                                moduleCache.push = function (value) {
                                     if (this.indexOf(value) == -1) {
                                         Array.prototype.push.apply(this, arguments);
                                     }
@@ -85,7 +85,7 @@
                                     }
 
                                     angular.forEach(getRequires(loadedModule), function (requireModule) {
-                                        modules.push(requireModule);
+                                        moduleCache.push(requireModule);
                                         var requireModuleConfig = self.getConfig(requireModule);
                                         if (requireModuleConfig) {
                                             loadScript(requireModuleConfig.script, function() {
@@ -100,19 +100,19 @@
                                                 });
                                             } else {
                                                 $log.warn('module "' + requireModule +"' not loaded and not configured");
-                                                onModuleLoad(regModules);
+                                                onModuleLoad(requireModule);
                                             }
                                         }
                                     });
 
-                                    onModuleLoad();
+                                    return onModuleLoad();
                                 }
 
                                 if (!scriptCache.get(resourceId)) {
                                     loadScript(config.script, function () {
-                                        modules.push(name);
+                                        moduleCache.push(name);
                                         loadDependencies(name, function () {
-                                            register(providers, modules);
+                                            register(providers, moduleCache);
                                             $timeout(function () {
                                                 callback(false);
                                             });
@@ -135,7 +135,7 @@
                     } else {
                         modules[config.name] = config;
                     }
-                    if (registeredModules) {
+                    if (registeredModules && angular.isArray(registeredModules)) {
                         angular.forEach(registeredModules, function(name) {
                             regModules.push(name);
                         });
@@ -143,7 +143,7 @@
                 };
             }]);
 
-    module.directive('loadOnDemand', ['$http', 'scriptCache', '$log', '$loadOnDemand', '$compile', '$timeout',
+    aModule.directive('loadOnDemand', ['$http', 'scriptCache', '$log', '$loadOnDemand', '$compile', '$timeout',
         function ($http, scriptCache, $log, $loadOnDemand, $compile, $timeout) {
             return {
                 link: function (scope, element, attr) {
@@ -186,10 +186,10 @@
                                 if (!moduleConfig.template) {
                                     return;
                                 }
-                                loadTemplate(moduleConfig.template, function(response) {
+                                loadTemplate(moduleConfig.template, function(template) {
 
                                     childScope = scope.$new();
-                                    element.html(response);
+                                    element.html(template);
 
                                     var content = element.contents(),
                                         linkFn = $compile(content);
