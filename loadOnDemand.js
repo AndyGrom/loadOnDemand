@@ -298,8 +298,11 @@
             }
         });
         if (appElement) {
-            var mainModule = angular.module(module);
-            regModules = regModules.concat(mainModule.requires);
+            (function addReg(module) {
+                regModules.push(module);
+                var mainModule = angular.module(module);
+                angular.forEach(mainModule.requires, addReg);
+            })(module);
         }
     }
 
