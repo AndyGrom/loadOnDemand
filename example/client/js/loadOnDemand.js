@@ -299,9 +299,11 @@
         });
         if (appElement) {
             (function addReg(module) {
-                regModules.push(module);
-                var mainModule = angular.module(module);
-                angular.forEach(mainModule.requires, addReg);
+                if (regModules.indexOf(module) == -1) {
+                    regModules.push(module);
+                    var mainModule = angular.module(module);
+                    angular.forEach(mainModule.requires, addReg);
+                }
             })(module);
         }
     }
