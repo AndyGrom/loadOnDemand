@@ -127,18 +127,14 @@
                             }
                         };
                     }];
-                this.config = function (config, registeredModules) {
+                this.config = function (config) {
+                    init(angular.element('html'));
                     if (angular.isArray(config)) {
                         angular.forEach(config, function (moduleConfig) {
                             modules[moduleConfig.name] = moduleConfig;
                         });
                     } else {
                         modules[config.name] = config;
-                    }
-                    if (registeredModules && angular.isArray(registeredModules)) {
-                        angular.forEach(registeredModules, function(name) {
-                            regModules.push(name);
-                        });
                     }
                 };
             }]);
@@ -260,6 +256,51 @@
             });
         }
         return null;
+    }
+    
+    function init(element) {
+        var elements = [element],
+            appElement,
+            module,
+            names = ['ng:app', 'ng-app', 'x-ng-app', 'data-ng-app'],
+            NG_APP_CLASS_REGEXP = /\sng[:\-]app(:\s*([\w\d_]+);?)?\s/;
+
+        function append(elm) {
+            elm && elements.push(elm);
+        }
+
+        angular.forEach(names, function (name) {
+            names[name] = true;
+            append(document.getElementById(name));
+            name = name.replace(':', '\\:');
+            if (element.querySelectorAll) {
+                angular.forEach(element.querySelectorAll('.' + name), append);
+                angular.forEach(element.querySelectorAll('.' + name + '\\:'), append);
+                angular.forEach(element.querySelectorAll('[' + name + ']'), append);
+            }
+        });
+
+        angular.forEach(elements, function (elm) {
+            if (!appElement) {
+                var className = ' ' + element.className + ' ';
+                var match = NG_APP_CLASS_REGEXP.exec(className);
+                if (match) {
+                    appElement = elm;
+                    module = (match[2] || '').replace(/\s+/g, ',');
+                } else {
+                    angular.forEach(elm.attributes, function (attr) {
+                        if (!appElement && names[attr.name]) {
+                            appElement = elm;
+                            module = attr.value;
+                        }
+                    });
+                }
+            }
+        });
+        if (appElement) {
+            var mainModule = angular.module(module);
+            regModules = regModules.concat(mainModule.requires);
+        }
     }
 
 })();
