@@ -71,6 +71,7 @@
                                     }
                                     var loadedModule = angular.module(moduleName),
                                         requires = getRequires(loadedModule);
+                                    
                                     function onModuleLoad(moduleLoaded) {
                                         if (moduleLoaded) {
 
@@ -80,32 +81,38 @@
                                             }
                                         }
                                         if (requires.length === 0) {
-                                            allDependencyLoad();
+                                            $timeout(function () {
+                                                allDependencyLoad(moduleName);
+                                            });
                                         }
                                     }
 
-                                    angular.forEach(getRequires(loadedModule), function (requireModule) {
+                                    var requireNeeded = getRequires(loadedModule);
+                                    angular.forEach(requireNeeded, function (requireModule) {
                                         moduleCache.push(requireModule);
+                                        
+                                        if (moduleExists(requireModule)) {
+                                            return onModuleLoad(requireModule);
+                                        }
+                                        
                                         var requireModuleConfig = self.getConfig(requireModule);
                                         if (requireModuleConfig) {
                                             loadScript(requireModuleConfig.script, function() {
-                                                loadDependencies(requireModule, function () {
-                                                    onModuleLoad(requireModule);
+                                                loadDependencies(requireModule, function requireModuleLoaded(name) {
+                                                    onModuleLoad(name);
                                                 });
                                             });
                                         } else {
-                                            if (moduleExists(requireModule)) {
-                                                loadDependencies(requireModule, function() {
-                                                    onModuleLoad(requireModule);
-                                                });
-                                            } else {
-                                                $log.warn('module "' + requireModule +"' not loaded and not configured");
-                                                onModuleLoad(requireModule);
-                                            }
+                                            $log.warn('module "' + requireModule + "' not loaded and not configured");
+                                            onModuleLoad(requireModule);
                                         }
+                                        return null;
                                     });
 
-                                    return onModuleLoad();
+                                    if (requireNeeded.length == 0) {
+                                        onModuleLoad();
+                                    }
+                                    return null;
                                 }
 
                                 if (!scriptCache.get(resourceId)) {
