@@ -128,7 +128,7 @@
                         };
                     }];
                 this.config = function (config) {
-                    init(angular.element('html'));
+                    init(angular.element(window.document));
                     if (angular.isArray(config)) {
                         angular.forEach(config, function (moduleConfig) {
                             modules[moduleConfig.name] = moduleConfig;
