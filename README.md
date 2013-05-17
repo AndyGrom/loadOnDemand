@@ -7,6 +7,7 @@ Key features
 ------------
 1. Dependencies are automatically loaded
 2. Debugger like ( no eval code )
+3. The ability to mix normal boot and load on demand
 
 Using
 -----
