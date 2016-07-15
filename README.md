@@ -42,4 +42,11 @@ Using
    <div load-on-demand="'module_name'"></div>
    ```
 
+you can load a list of modules
+
+   ```html
+   <div load-on-demand="['module_name','module_name2']"></div>
+   ```
+
+
 See the example in the folder 'example'
