@@ -1,4 +1,4 @@
-﻿/*global angular*/
+/*global angular*/
 (function () {
     'use strict';
     var regModules = ["ng"];
@@ -32,6 +32,28 @@
                                 return modules[name];
                             },
                             load: function (name, callback) {
+	                            if (Array.isArray(name)){
+		                        	var $this=this;
+		                        	
+		                        	var sync={
+			                        	count:name.length,
+			                        	status:true,
+			                        	ready:function(status){
+				                        	this.count--;
+				                        	this.status=this.status & status;
+				                        	if (this.count==0)
+				                        		callback(this.status);
+			                        	}
+		                        	}
+		                        	
+		                        	name.forEach(function(item){
+			                        	$this.load(item,function(status){sync.ready(status)});
+			                        });
+			                        
+		                        	return null;    
+	                            }
+	                            
+	                            
                                 var self = this,
                                     config = self.getConfig(name),
                                     resourceId = 'script:' + config.script,
@@ -186,6 +208,9 @@
 
                         if (moduleName) {
                             $loadOnDemand.load(moduleName, function() {
+	                            if (!moduleConfig)
+	                            	return;
+	                            	
                                 if (!moduleConfig.template) {
                                     return;
                                 }
@@ -316,5 +341,4 @@
     }
 
 })();
-
 
